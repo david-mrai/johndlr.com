@@ -1,0 +1,605 @@
+@layer reset, base, theme, components, utilities;
+
+/* ---------------------------------------------------------------- */
+/* Fonts                                                             */
+/* ---------------------------------------------------------------- */
+@import url("https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600&display=swap");
+
+/* ---------------------------------------------------------------- */
+/* Reset                                                              */
+/* ---------------------------------------------------------------- */
+@layer reset {
+  :where(*, *::before, *::after) {
+    box-sizing: border-box;
+  }
+
+  :where(html) {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  :where(body, h1, h2, h3, h4, p, dl, dd, figure) {
+    margin: 0;
+  }
+
+  :where(ul, ol) {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  :where(img, svg) {
+    display: block;
+    max-inline-size: 100%;
+  }
+
+  :where(a) {
+    color: inherit;
+  }
+
+  :where(button) {
+    font: inherit;
+    color: inherit;
+    background: none;
+    border: 0;
+    cursor: pointer;
+  }
+}
+
+/* ---------------------------------------------------------------- */
+/* Design tokens & base                                              */
+/* ---------------------------------------------------------------- */
+@layer base {
+  :root {
+    color-scheme: dark;
+
+    /* Tier 1: literal tokens */
+    --color-black: #0a0a0a;
+    --color-black-soft: #131313;
+    --color-charcoal: #1c1c1e;
+    --color-silver: #a5acaf;
+    --color-silver-bright: #d3d8da;
+    --color-white: #f5f6f6;
+
+    /* Tier 2: semantic tokens */
+    --color-bg: var(--color-black);
+    --color-bg-alt: var(--color-black-soft);
+    --color-surface: var(--color-charcoal);
+    --color-accent: var(--color-silver);
+    --color-accent-bright: var(--color-silver-bright);
+    --color-text: var(--color-white);
+    --color-text-muted: color-mix(in oklab, var(--color-white) 60%, var(--color-black));
+    --color-border: color-mix(in oklab, var(--color-silver) 35%, transparent);
+
+    /* Typography */
+    --font-heading: "Oswald", "Arial Narrow", system-ui, sans-serif;
+    --font-body: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+
+    /* Layout */
+    --content-max: 68rem;
+    --space-section: clamp(3.5rem, 6vw + 1rem, 7rem);
+    --radius-md: 0.75rem;
+    --radius-lg: 1.25rem;
+
+    /* Motion */
+    --ease-standard: cubic-bezier(0.2, 0.7, 0.2, 1);
+
+    @property --animation-reduced {
+      syntax: "*";
+      inherits: false;
+      initial-value: none;
+    }
+  }
+
+  @media (forced-colors: active) {
+    :root {
+      --color-border: CanvasText;
+    }
+  }
+
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 5.5rem;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+    * {
+      animation: var(--animation-reduced) !important;
+    }
+  }
+
+  body {
+    background: var(--color-bg);
+    color: var(--color-text);
+    font-family: var(--font-body);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1, h2, h3 {
+    font-family: var(--font-heading);
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    line-height: 1.1;
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+    overflow-wrap: break-word;
+  }
+
+  h1 { font-size: clamp(2.5rem, 3vw + 1.5rem, 4.5rem); }
+  h2 { font-size: clamp(1.75rem, 1.5vw + 1.3rem, 2.75rem); }
+  h3 {
+    font-size: 1.1rem;
+    letter-spacing: 0.08em;
+    color: var(--color-accent-bright);
+  }
+
+  code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    background: color-mix(in oklab, var(--color-silver) 15%, transparent);
+    padding: 0.1em 0.4em;
+    border-radius: 0.3em;
+    font-size: 0.9em;
+  }
+
+  :where(a:any-link, button, [tabindex]):focus-visible {
+    outline: 3px solid var(--color-silver-bright);
+    outline-offset: 3px;
+  }
+}
+
+/* ---------------------------------------------------------------- */
+/* Theme: shared visual patterns                                     */
+/* ---------------------------------------------------------------- */
+@layer theme {
+  .eyebrow {
+    font-family: var(--font-heading);
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    font-size: 0.8rem;
+    color: var(--color-accent);
+    margin-block-end: 0.75rem;
+  }
+
+  .lead {
+    max-width: 42rem;
+    font-size: 1.1rem;
+    color: color-mix(in oklab, var(--color-text) 88%, var(--color-black));
+  }
+}
+
+/* ---------------------------------------------------------------- */
+/* Components                                                        */
+/* ---------------------------------------------------------------- */
+@layer components {
+
+  /* Skip link */
+  .skip-link:where(:not(:focus-within, :active)) {
+    position: absolute;
+    clip-path: inset(50%);
+    overflow: hidden;
+    inline-size: 1px;
+    block-size: 1px;
+    white-space: nowrap;
+  }
+  .skip-link:focus-within,
+  .skip-link:active {
+    position: fixed;
+    inset-block-start: 1rem;
+    inset-inline-start: 1rem;
+    z-index: 100;
+    padding: 0.6rem 1rem;
+    background: var(--color-silver-bright);
+    color: var(--color-black);
+    border-radius: var(--radius-md);
+    font-weight: 600;
+  }
+
+  /* Header / nav */
+  .site-header {
+    position: sticky;
+    inset-block-start: 0;
+    z-index: 50;
+    background: color-mix(in oklab, var(--color-bg) 88%, transparent);
+    backdrop-filter: blur(10px);
+    border-block-end: 1px solid var(--color-border);
+  }
+
+  .header-inner {
+    max-width: var(--content-max);
+    margin-inline: auto;
+    padding-inline: 1.25rem;
+    block-size: 4.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    text-decoration: none;
+    font-family: var(--font-heading);
+  }
+
+  .brand-mark {
+    display: grid;
+    place-items: center;
+    inline-size: 2.4rem;
+    block-size: 2.4rem;
+    border-radius: 50%;
+    background: linear-gradient(155deg in oklab, var(--color-silver-bright), var(--color-silver) 60%, var(--color-black-soft));
+    color: var(--color-black);
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+  }
+
+  .brand-name {
+    font-size: 1rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .primary-nav ul {
+    display: flex;
+    gap: 1.75rem;
+  }
+
+  .primary-nav a {
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 500;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+    padding-block: 0.35rem;
+    border-block-end: 2px solid transparent;
+    transition: color 0.2s var(--ease-standard), border-color 0.2s var(--ease-standard);
+  }
+
+  .primary-nav a:hover,
+  .primary-nav a.is-active {
+    color: var(--color-text);
+    border-block-end-color: var(--color-silver);
+  }
+
+  .menu-button {
+    display: none;
+    inline-size: 2.75rem;
+    block-size: 2.75rem;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-md);
+    color: var(--color-text);
+  }
+
+  .menu-button svg {
+    inline-size: 1.5rem;
+    block-size: 1.5rem;
+  }
+
+  @media (width <= 46rem) {
+    .primary-nav { display: none; }
+    .menu-button { display: inline-flex; }
+  }
+
+  /* Mobile nav (Popover API) */
+  .mobile-nav {
+    position: fixed;
+    inset-block: 0;
+    inset-inline-end: 0;
+    inset-inline-start: auto;
+    margin: 0;
+    inline-size: min(80vw, 20rem);
+    block-size: 100dvh;
+    max-block-size: none;
+    border: 0;
+    border-inline-start: 1px solid var(--color-border);
+    background: var(--color-bg-alt);
+    color: var(--color-text);
+    padding: 5.5rem 1.5rem 2rem;
+    translate: 100% 0;
+    transition: translate 0.32s var(--ease-standard), display 0.32s allow-discrete, overlay 0.32s allow-discrete;
+  }
+
+  .mobile-nav:popover-open {
+    translate: 0 0;
+  }
+
+  @starting-style {
+    .mobile-nav:popover-open {
+      translate: 100% 0;
+    }
+  }
+
+  .mobile-nav::backdrop {
+    background: color-mix(in oklab, var(--color-black) 60%, transparent);
+    transition: background 0.32s var(--ease-standard), display 0.32s allow-discrete, overlay 0.32s allow-discrete;
+  }
+
+  .mobile-nav:popover-open::backdrop {
+    background: color-mix(in oklab, var(--color-black) 60%, transparent);
+  }
+
+  @starting-style {
+    .mobile-nav:popover-open::backdrop {
+      background: transparent;
+    }
+  }
+
+  .mobile-nav ul {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  .mobile-nav a {
+    text-decoration: none;
+    font-family: var(--font-heading);
+    font-size: 1.15rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: var(--color-text);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .mobile-nav,
+    .mobile-nav::backdrop {
+      transition-duration: 1ms;
+    }
+  }
+
+  /* Hero */
+  .hero {
+    position: relative;
+    display: grid;
+    place-items: center;
+    min-block-size: min(46rem, 92dvh);
+    padding-block: var(--space-section);
+    padding-inline: 1.25rem;
+    text-align: center;
+    overflow: clip;
+  }
+
+  .hero-bg {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(60% 55% at 50% 15%, color-mix(in oklab, var(--color-silver) 22%, transparent), transparent),
+      linear-gradient(180deg in oklab, var(--color-black), var(--color-black-soft));
+    z-index: -1;
+  }
+
+  .hero-inner {
+    max-width: 44rem;
+  }
+
+  .hero-tagline {
+    margin-block-start: 1.25rem;
+    font-size: 1.15rem;
+    color: var(--color-text-muted);
+  }
+
+  .hero-actions {
+    margin-block-start: 2rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: center;
+  }
+
+  /* Buttons */
+  .button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-block-size: 2.9rem;
+    padding-inline: 1.6rem;
+    border-radius: 999px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.95rem;
+    letter-spacing: 0.02em;
+    transition: transform 0.15s var(--ease-standard), background 0.2s var(--ease-standard), color 0.2s var(--ease-standard);
+  }
+
+  .button:hover {
+    transform: translateY(-2px);
+  }
+
+  .button-primary {
+    background: linear-gradient(135deg in oklab, var(--color-silver-bright), var(--color-silver));
+    color: var(--color-black);
+  }
+
+  .button-ghost {
+    border: 1px solid var(--color-border);
+    color: var(--color-text);
+  }
+
+  .button-ghost:hover {
+    border-color: var(--color-silver);
+  }
+
+  /* Sections */
+  .section {
+    padding-block: var(--space-section);
+    padding-inline: 1.25rem;
+  }
+
+  .section-alt {
+    background: var(--color-bg-alt);
+  }
+
+  .section-inner {
+    max-width: var(--content-max);
+    margin-inline: auto;
+  }
+
+  .section h2 {
+    margin-block-end: 1rem;
+  }
+
+  /* Specs card */
+  .specs-card {
+    margin-block-start: 2.5rem;
+    padding: 1.75rem;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+  }
+
+  .specs-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+    gap: 1.25rem 1.5rem;
+    margin-block-start: 1rem;
+  }
+
+  .spec dt {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--color-text-muted);
+    margin-block-end: 0.25rem;
+  }
+
+  .spec dd {
+    font-weight: 600;
+  }
+
+  .specs-note {
+    margin-block-start: 1.5rem;
+    padding-block-start: 1.25rem;
+    border-block-start: 1px solid var(--color-border);
+    color: var(--color-text-muted);
+    font-size: 0.95rem;
+  }
+
+  /* Fan facts list */
+  .fan-facts {
+    margin-block-start: 2rem;
+    display: grid;
+    gap: 1px;
+    background: var(--color-border);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    overflow: clip;
+  }
+
+  .fan-facts li {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1rem 1.25rem;
+    background: var(--color-surface);
+  }
+
+  .fan-fact-label {
+    color: var(--color-text-muted);
+  }
+
+  .fan-fact-value {
+    font-weight: 600;
+    text-align: right;
+  }
+
+  /* Photo placeholders */
+  .photo-placeholder {
+    margin-block-start: 2.5rem;
+  }
+
+  .placeholder-box {
+    aspect-ratio: 16 / 9;
+    display: grid;
+    place-items: center;
+    border: 2px dashed var(--color-border);
+    border-radius: var(--radius-lg);
+    background: repeating-linear-gradient(-45deg, var(--color-surface) 0 1em, var(--color-bg-alt) 0 2em);
+    color: var(--color-text-muted);
+    font-size: 0.95rem;
+    text-align: center;
+    padding: 1rem;
+  }
+
+  .photo-placeholder figcaption {
+    margin-block-start: 0.75rem;
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+  }
+
+  .gallery-grid {
+    margin-block-start: 2rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+    gap: 1.25rem;
+  }
+
+  .placeholder-box-small {
+    aspect-ratio: 4 / 3;
+  }
+
+  /* Contact */
+  .section-contact {
+    text-align: center;
+  }
+
+  .section-contact .section-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .contact-links {
+    margin-block-start: 1.75rem;
+  }
+
+  /* Footer */
+  .site-footer {
+    padding: 2.5rem 1.25rem;
+    text-align: center;
+    border-block-start: 1px solid var(--color-border);
+    color: var(--color-text-muted);
+    font-size: 0.85rem;
+  }
+
+  .footer-sub {
+    margin-block-start: 0.35rem;
+  }
+}
+
+/* ---------------------------------------------------------------- */
+/* Utilities: scroll reveal                                          */
+/* ---------------------------------------------------------------- */
+@layer utilities {
+  /* Content is fully visible by default — this is a progressive
+     enhancement. The .js class is only added by main.js, and only once
+     an IntersectionObserver is confirmed available, so a JS failure or
+     an old browser always leaves content visible. */
+  .js .reveal {
+    opacity: 0;
+    translate: 0 1.5rem;
+    transition: opacity 0.6s var(--ease-standard), translate 0.6s var(--ease-standard);
+  }
+
+  .js .reveal.is-visible {
+    opacity: 1;
+    translate: 0 0;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .js .reveal {
+      opacity: 1;
+      translate: 0 0;
+      transition: none;
+    }
+  }
+}
