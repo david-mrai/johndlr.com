@@ -259,16 +259,56 @@ trusted signature!` is normal and expected for a self-published,
 uncertified key — it's not an error. Confirmed working live against
 `https://johndlr.com/` on 2026-08-24.
 
-## TLSA (DANE) — no automated sync for this domain
+## TLSA (DANE) sync
 
-`dig +short TLSA _443._tcp.johndlr.com` returns a `3 0 1` (DANE-EE,
-full cert, SHA-256) record — Virtualmin appears to have created it
-automatically when the certificate was issued. **There is no cron job
-or other automation keeping it in sync with cert renewals for
-johndlr.com.** The only TLSA-sync cron job on this host
-(`crontab -l -u root`) is scoped to a different tenant, `zcurity.com`
-— don't assume it covers johndlr.com, and don't add a
-johndlr.com-specific line to that job. If DANE needs to stay valid here
-long-term, set up `virtualmin modify-dns --domain johndlr.com
---sync-tlsa` on its own schedule rather than assuming existing
-automation already handles it.
+johndlr.com publishes a `_443._tcp` TLSA record (`3 0 1` — DANE-EE, full
+cert, SHA-256), pinned to the domain's Let's Encrypt/Virtualmin-managed
+certificate. DANE only provides real security if the TLSA hash matches
+whatever certificate is actually being served, which breaks silently (no
+error, just rejected connections for DANE-validating clients) whenever
+the cert renews with a new key.
+
+**This is handled automatically** via a daily cron job on `ns1`
+(`crontab -l -u root`, added 2026-08-24, `22 15 * * *`, right next to
+the existing `zcurity.com` TLSA-sync job and the `resign.pl`
+DNSSEC-refresh job at `34 15 * * *`):
+
+```
+22 15 * * * /usr/sbin/virtualmin modify-dns --domain johndlr.com --sync-tlsa >> /var/log/johndlr-tlsa-sync.log 2>&1
+```
+
+`virtualmin modify-dns --sync-tlsa` is Virtualmin's own first-party
+feature (`virtualmin help modify-dns`) — it re-signs the zone (via the
+same DNSSEC key material as everything else on this nameserver) and
+restarts DNS for the domain. **Prefer this over any hand-rolled
+zone-file edit + `dnssec-signzone` script** — reproducing Virtualmin's
+signing/serial-bump logic by hand is exactly the kind of thing that's
+easy to get subtly wrong on a shared nameserver serving other domains
+too.
+
+The first manual run (2026-08-24) actually changed the zone file (serial
+bumped to `2026082403`) rather than being a no-op — this domain had
+never had a TLSA sync run before, so the record it already had matched
+the current cert by coincidence rather than by being kept in sync.
+Confirmed afterward with `named-checkzone` (`DNSSEC signed` / `OK`) and
+by comparing the TLSA hash against the live cert directly. Log rotated
+weekly, 8 weeks kept, via `/etc/logrotate.d/johndlr-tlsa-sync` (mirrors
+the `zcurity.com` config, including a pre-existing, host-wide
+`logrotate -d` warning about `/var/log`'s group-writable permissions —
+that's not specific to this file and wasn't introduced by this change).
+
+**Root's crontab is shared** — every domain on this host has its cron
+in the same file. The job above was appended after backing up the prior
+crontab (`/root/root-crontab-backup-<timestamp>.txt`); if you ever need
+to edit it again, back it up the same way first (`crontab -l -u root >
+backup-file`) rather than assuming a raw edit won't clobber an unrelated
+entry.
+
+To verify TLSA is actually in sync with the live cert at any time:
+
+```bash
+dig +short TLSA _443._tcp.johndlr.com
+echo | openssl s_client -connect johndlr.com:443 -servername johndlr.com 2>/dev/null \
+  | openssl x509 -outform DER 2>/dev/null | openssl dgst -sha256
+# the hex after "3 0 1" in the TLSA record should match the openssl dgst output
+```
