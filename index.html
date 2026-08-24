@@ -3,6 +3,13 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!--
+    frame-ancestors and any report-to/report-uri are silently ignored inside
+    a <meta> CSP (spec restriction) — if this site ever moves behind a
+    server/CDN you control, also set the header version with:
+    frame-ancestors 'none'; report-to csp-endpoint
+  -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self'; connect-src 'none'; base-uri 'none'; form-action 'none'; object-src 'none'; require-trusted-types-for 'script'; upgrade-insecure-requests">
   <title>John de los Reyes | Raider Nation &amp; Classic Steel</title>
   <meta name="description" content="John de los Reyes — Ontario, California. Las Vegas Raiders diehard and proud owner of a 1954 Chevrolet Bel Air.">
   <meta name="theme-color" content="#0d0d0d">

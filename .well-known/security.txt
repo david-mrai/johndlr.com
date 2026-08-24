@@ -1,0 +1,24 @@
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+Contact: mailto:david+security@mrai.dev
+Expires: 2027-08-24T23:59:59.000Z
+Preferred-Languages: en
+Canonical: https://johndlr.com/.well-known/security.txt
+-----BEGIN PGP SIGNATURE-----
+
+iQJoBAEBCgBSFiEE+kW1+8rQkPLpN8QerPDsoWaFf20FAmqMyxAbFIAAAAAABAAO
+bWFudTIsMi41KzEuMTIsMCwzGBxkYXZpZCtzZWN1cml0eUBtcmFpLmRldgAKCRCs
+8OyhZoV/bdsgD/9WtMWLRDrcf0EwNxTsE0BHJUheZLVF0mGZFaYXUrRIV++7EGMa
+4ywknYeyMd/zaXD4J7lfNT9UJosW9Y+ZQ0TTL+8DqqXMWgxcTXfCXOooVSPyrKKM
+/7dX/f4Gp5zHVQs5kAENfU4mNE4MqPOAahTKpbrzHzgp6ffJxp1taaCeGiekTQGj
+/wyZzOQYbxWit9Ov8FfH/O3TdD48VXKtV1PzfCVVuB9XazTEg/XDzCTTogiCjCpj
+DmzR0UAEzvbzzD/ec+dzKqFnmdvUkW6IEQNsJ+LuU7fXI0fjuFFGluwpEZt81DS4
+8BFqAUoZUUsqB14xZSbA12v6V2VpmVoKzk8+5dXmzAeMW2vpx5S27N1TR9ivxEFF
+n7kDRa12p/fLLF1CSHZWdXnNYkIvfe0pjVqWwbvCeWin21Qpn11/3DGWhk++rQoy
+wfNu8m38aAiV2HhQHgDG+ivNotRMSAPMn1LOYCXkXAyVZMNg0sAUsTUab3GXmVgS
+3XWFeqZVqgnobg4XWLnEjzBjlfbYtys+wjvy6v0YF6Zh8bbXfDJzrnJR1viOGsdz
+t0qxNEGPE3jCHvkqWosa7CvyKbjJDwnYMN0hLwzRU1fWHc1yrUyF7JrAEsiSCC9R
+r9tHnHYWETB6iaQAfGecwfudZlDXmBbsJ52vYnVsikaQk2n+izzplyAXgw==
+=1LyF
+-----END PGP SIGNATURE-----
