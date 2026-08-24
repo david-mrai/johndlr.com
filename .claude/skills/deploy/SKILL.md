@@ -19,21 +19,102 @@ robots.txt
 .well-known/pgp-key.txt
 ```
 
-**No production host is configured in this repo.** The README says to
-point `johndlr.com` at whatever static host is chosen (Netlify, Vercel,
-GitHub Pages, S3 + CloudFront, a plain VPS, etc.) and serve this
-directory as the site root. If/when a real host is set up, replace this
-section with the actual sync steps (rsync target, deploy hook, CLI
-command — whichever applies) and how to verify a deploy landed. Until
-then, treat "deploy" as: confirm `git status`/`git log` show what the
-user intends to ship, then hand off to whatever the chosen host's
-publish mechanism is.
+## Production host
+
+Production is a Virtualmin-managed box reachable over SSH as `ns1`
+(`~/.ssh/config` → `ns1.digicrew.com`, user `ubuntu`, `sudo -n` is
+passwordless there — confirmed live 2026-08-24). Files live in
+`/home/johndlr/public_html`, owned by `johndlr:johndlr`. This host also
+serves other, unrelated tenants (`zcurity.com` and others) — don't
+assume something found on the box belongs to johndlr.com without
+checking; see the TLSA note below for a case where that mattered.
+
+Do not skip the dry run and post-deploy verification steps — this
+writes directly to the live production host.
+
+### 1. Confirm what you're shipping
+
+```bash
+git status --short
+git log --oneline -5
+```
+
+Don't deploy uncommitted or unintended changes without checking with the
+user first.
+
+### 2. Dry-run, then real sync to a staging path (no root needed)
+
+```bash
+rsync -avzn --exclude='.git' --exclude='.claude' ./ ns1:/tmp/johndlr_deploy/
+```
+
+Read the output. As of 2026-08-24 the full tracked tree is exactly 14
+files: `README.md`, `index.html`, `robots.txt`, `sitemap.xml`,
+`.well-known/security.txt`, `.well-known/pgp-key.txt`,
+`assets/favicon.svg`, `css/styles.css`, `js/main.js`. Nothing else.
+There is no WordPress, no PHP, no per-page subdirectories — if a dry run
+ever shows more than that, stop and investigate before proceeding. Once
+it looks right:
+
+```bash
+rsync -avz --exclude='.git' --exclude='.claude' ./ ns1:/tmp/johndlr_deploy/
+```
+
+### 3. Move into place as root, fix ownership, clean up staging
+
+```bash
+ssh -o BatchMode=yes ns1 'sudo -n bash -s' <<'REMOTE'
+set -e
+DEST=/home/johndlr/public_html
+SRC=/tmp/johndlr_deploy
+rsync -a "$SRC/" "$DEST/"
+chown -R johndlr:johndlr "$DEST"
+rm -rf "$SRC"
+REMOTE
+```
+
+No `--delete` is used, so nothing gets removed server-side that isn't
+also removed from this repo — if a stray file ever shows up on the
+server that isn't tracked here, flag it and ask before deleting rather
+than assuming `--delete` is safe.
+
+### 4. Verify like an outside visitor
+
+```bash
+for p in / /sitemap.xml /.well-known/security.txt /.well-known/pgp-key.txt /robots.txt; do
+  code=$(curl -s -o /dev/null -w "%{http_code}" "https://johndlr.com${p}")
+  echo "$p -> $code"
+done
+curl -sI https://johndlr.com/ | grep -i "content-security-policy\|strict-transport"
+```
+
+Report the verification results back to the user — don't just say
+"deployed."
 
 ## Content-Security-Policy maintenance
 
-The CSP ships as a `<meta http-equiv="Content-Security-Policy">` tag in
-`index.html` (there's no server config in this repo to attach a real
-header to). Current policy:
+The CSP is set in **two places** that must be kept in sync:
+
+1. A `<meta http-equiv="Content-Security-Policy">` tag in `index.html`
+   (so the policy still applies if this repo is ever served from
+   somewhere other than the current host).
+2. `Header always set Content-Security-Policy "..."` inside
+   `johndlr.com.conf`'s `:443` `VirtualHost` block on `ns1`
+   (`/etc/apache2/sites-available/johndlr.com.conf`), right next to the
+   existing HSTS header. This is the authoritative one in production —
+   it's also the only one that can carry `frame-ancestors` (see below).
+
+**This is deliberately scoped per-vhost, not in the shared
+`/etc/apache2/conf-available/security.conf`.** That shared file applies
+to every tenant on this host and already sets
+`X-Content-Type-Options: nosniff`, `X-Frame-Options: SAMEORIGIN`, and
+`Referrer-Policy: same-origin` for everyone (confirmed live 2026-08-24)
+— it has no CSP of its own. Don't add johndlr.com-specific policy
+(especially the exact source list here, which is meaningless for other
+tenants' content) into that shared file.
+
+Current policy — identical in both places except the header also
+carries `frame-ancestors 'none'`, which a `<meta>` tag can't express:
 
 ```
 default-src 'none';
@@ -45,8 +126,36 @@ connect-src 'none';
 base-uri 'none';
 form-action 'none';
 object-src 'none';
+frame-ancestors 'none';
 require-trusted-types-for 'script';
 upgrade-insecure-requests
+```
+
+To ship a change to the header on the server:
+
+```bash
+CSP="default-src 'none'; script-src 'self'; ..."   # full value, single line
+echo "$CSP" > /tmp/csp_value.txt
+scp /tmp/csp_value.txt ns1:/tmp/csp_value.txt && rm /tmp/csp_value.txt
+
+ssh -o BatchMode=yes ns1 'sudo -n bash -s' <<'REMOTE'
+set -e
+CONF=/etc/apache2/sites-available/johndlr.com.conf
+cp "$CONF" "$CONF.bak-$(date +%Y%m%d%H%M%S)"
+python3 - "$CONF" /tmp/csp_value.txt <<'PYEOF'
+import re, sys
+conf_path, csp_path = sys.argv[1], sys.argv[2]
+text = open(conf_path).read()
+csp_value = open(csp_path).read().strip()
+pattern = re.compile(r'Header always set Content-Security-Policy "[^"]*"')
+if not pattern.search(text):
+    sys.exit("existing CSP line not found")
+open(conf_path, "w").write(pattern.sub(f'Header always set Content-Security-Policy "{csp_value}"', text, count=1))
+PYEOF
+rm -f /tmp/csp_value.txt
+apachectl configtest
+systemctl reload apache2
+REMOTE
 ```
 
 Why each piece is there: `default-src 'none'` denies everything not
@@ -78,20 +187,18 @@ execution) unless `script-src`/`style-src` are loosened or the content
 is moved into `js/main.js` / `css/styles.css` instead — prefer moving it
 out over loosening the policy.
 
-**Verify like an outside visitor, not from local assumptions.** Serve
-the site locally and check for `securitypolicyviolation` events in a
-real browser rather than just eyeballing the policy string — a page that
-"looks right" can still silently drop something the policy blocks. One
-way to do this headlessly:
-
-```bash
-npx --yes serve -l 8934 . &
-# then drive a real Chrome instance (headless is fine) to
-# http://localhost:8934/, enable the Log/Page CDP domains, and watch for
-# console entries with source "security" or matching /content security
-# policy/i — that's what actually caught issues here, not just reading
-# the directive list.
-```
+**Verify like an outside visitor, not from local assumptions.** A 200
+status and a header that "looks right" prove nothing about whether a
+browser actually accepted the policy. Drive a real Chrome instance
+(headless is fine) to `https://johndlr.com/`, enable the CDP `Log` and
+`Page` domains, and watch for console entries with `source: "security"`
+or matching `/content security policy/i`. This is what actually caught
+issues in the past — checking headers/hashes alone did not. If you're
+testing a change before it's live, serve the repo locally
+(`npx --yes serve -l 8934 .`) and point the same check at
+`http://localhost:8934/` first, but still re-check the live site after
+deploying since the header comes from a separate config file that can
+drift out of sync with `index.html`.
 
 ## security.txt maintenance
 
@@ -149,8 +256,19 @@ rm -rf "$FRESH_GNUPGHOME" /tmp/fetched-security.txt
 Expect `gpg: Good signature from "johndlr Security <david+security@mrai.dev>"`.
 The accompanying `WARNING: The key's User ID is not certified with a
 trusted signature!` is normal and expected for a self-published,
-uncertified key — it's not an error.
+uncertified key — it's not an error. Confirmed working live against
+`https://johndlr.com/` on 2026-08-24.
 
-(Note: this verification step assumes the site is actually being served
-at `https://johndlr.com/` — until a production host is wired up, run it
-against wherever the files are actually being served instead.)
+## TLSA (DANE) — no automated sync for this domain
+
+`dig +short TLSA _443._tcp.johndlr.com` returns a `3 0 1` (DANE-EE,
+full cert, SHA-256) record — Virtualmin appears to have created it
+automatically when the certificate was issued. **There is no cron job
+or other automation keeping it in sync with cert renewals for
+johndlr.com.** The only TLSA-sync cron job on this host
+(`crontab -l -u root`) is scoped to a different tenant, `zcurity.com`
+— don't assume it covers johndlr.com, and don't add a
+johndlr.com-specific line to that job. If DANE needs to stay valid here
+long-term, set up `virtualmin modify-dns --domain johndlr.com
+--sync-tlsa` on its own schedule rather than assuming existing
+automation already handles it.
