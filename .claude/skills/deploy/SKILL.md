@@ -100,18 +100,20 @@ The CSP is set in **two places** that must be kept in sync:
    somewhere other than the current host).
 2. `Header always set Content-Security-Policy "..."` inside
    `johndlr.com.conf`'s `:443` `VirtualHost` block on `ns1`
-   (`/etc/apache2/sites-available/johndlr.com.conf`), right next to the
-   existing HSTS header. This is the authoritative one in production —
-   it's also the only one that can carry `frame-ancestors` (see below).
+   (`/etc/apache2/sites-available/johndlr.com.conf`). This is the
+   authoritative one in production — it's also the only one that can
+   carry `frame-ancestors` (see below).
 
 **This is deliberately scoped per-vhost, not in the shared
 `/etc/apache2/conf-available/security.conf`.** That shared file applies
-to every tenant on this host and already sets
-`X-Content-Type-Options: nosniff`, `X-Frame-Options: SAMEORIGIN`, and
-`Referrer-Policy: same-origin` for everyone (confirmed live 2026-08-24)
-— it has no CSP of its own. Don't add johndlr.com-specific policy
-(especially the exact source list here, which is meaningless for other
-tenants' content) into that shared file.
+to every tenant on this host and sets `ServerTokens Prod`,
+`ServerSignature Off`, `TraceEnable Off`,
+`X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`,
+`Referrer-Policy: no-referrer`, and — as of 2026-08-30 —
+`Strict-Transport-Security "max-age=63072000; includeSubDomains; preload"`
+host-wide (see the HSTS note below). It has no CSP of its own. Don't add
+johndlr.com-specific policy (especially the exact source list here,
+which is meaningless for other tenants' content) into that shared file.
 
 Current policy — identical in both places except the header also
 carries `frame-ancestors 'none'`, which a `<meta>` tag can't express:
@@ -199,6 +201,35 @@ testing a change before it's live, serve the repo locally
 `http://localhost:8934/` first, but still re-check the live site after
 deploying since the header comes from a separate config file that can
 drift out of sync with `index.html`.
+
+## HSTS (Strict-Transport-Security)
+
+As of **2026-08-30**, HSTS is set **host-wide** on `ns1`, not per-vhost:
+
+```
+Header always set Strict-Transport-Security "max-age=63072000; includeSubDomains; preload"
+```
+
+lives in the shared `/etc/apache2/conf-available/security.conf` (loaded
+via `conf-enabled/` before any vhost), so every tenant domain on the box
+inherits the same value. Before this, all ~25 vhosts each carried their
+own copy with inconsistent casing (`includeSubDomains` vs
+`includeSubdomains`); every one of those per-vhost lines was stripped
+from every enabled config the same day, with no exceptions left.
+Backups: shared file at `security.conf.bak-20260830185853`, all vhost
+copies under `/root/hsts-vhost-strip-20260830185914/` on `ns1`.
+
+- **No enabled vhost sets HSTS itself anymore** — don't re-add one to
+  `johndlr.com.conf` or any other; the shared config covers them all.
+  The `Header always set Content-Security-Policy` line is now the only
+  `Header` directive left in johndlr.com's `:443` block.
+- `max-age=63072000` is 2 years; `preload` is a hard commitment (getting
+  a domain *off* the browser preload list is slow). Don't add a new
+  domain to this host that isn't fully HTTPS-ready on every subdomain.
+- Any edit to this value must go in the shared file and be verified
+  against several tenant domains (`curl -sI https://<domain>/ | grep -i
+  strict-transport`), not just johndlr.com — and check a 404 response
+  too, since `always` is what makes it appear on error pages.
 
 ## security.txt maintenance
 
