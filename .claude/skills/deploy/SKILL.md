@@ -207,7 +207,7 @@ drift out of sync with `index.html`.
 As of **2026-08-30**, HSTS is set **host-wide** on `ns1`, not per-vhost:
 
 ```
-Header always set Strict-Transport-Security "max-age=63072000; includeSubDomains; preload"
+Header always set Strict-Transport-Security "max-age=63072000; includeSubDomains; preload" "expr=%{HTTPS} == 'on'"
 ```
 
 lives in the shared `/etc/apache2/conf-available/security.conf` (loaded
@@ -216,8 +216,16 @@ inherits the same value. Before this, all ~25 vhosts each carried their
 own copy with inconsistent casing (`includeSubDomains` vs
 `includeSubdomains`); every one of those per-vhost lines was stripped
 from every enabled config the same day, with no exceptions left.
-Backups: shared file at `security.conf.bak-20260830185853`, all vhost
+Backups: shared file at `security.conf.bak-20260830185853` (pre-HSTS)
+and `security.conf.bak-20260830190813` (pre-`expr=` guard), all vhost
 copies under `/root/hsts-vhost-strip-20260830185914/` on `ns1`.
+
+The `"expr=%{HTTPS} == 'on'"` guard is required: without it the
+server-scope directive also fires on the `:80` redirect vhosts, so
+plain-HTTP `301`/`302` responses carry an HSTS header. Browsers ignore
+HSTS over HTTP per RFC 6797, but scanners flag it ("Unnecessary HSTS
+header over HTTP"). With the guard, HTTP responses have no HSTS and
+HTTPS responses (including error pages) still do.
 
 - **No enabled vhost sets HSTS itself anymore** — don't re-add one to
   `johndlr.com.conf` or any other; the shared config covers them all.
@@ -228,8 +236,9 @@ copies under `/root/hsts-vhost-strip-20260830185914/` on `ns1`.
   domain to this host that isn't fully HTTPS-ready on every subdomain.
 - Any edit to this value must go in the shared file and be verified
   against several tenant domains (`curl -sI https://<domain>/ | grep -i
-  strict-transport`), not just johndlr.com — and check a 404 response
-  too, since `always` is what makes it appear on error pages.
+  strict-transport`), not just johndlr.com — check a 404 response too,
+  since `always` is what makes it appear on error pages, and check a
+  plain-`http://` response has *no* HSTS header (the `expr=` guard).
 
 ## security.txt maintenance
 
