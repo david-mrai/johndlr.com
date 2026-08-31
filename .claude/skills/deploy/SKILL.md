@@ -254,14 +254,18 @@ HTTPS responses (including error pages) still do.
 ## security.txt maintenance
 
 `.well-known/security.txt` (RFC 9116) is PGP clear-signed for
-`david+security@mrai.dev`. Key: RSA 4096, sign-only, fingerprint
-`D10E 948E 4C4C 0F5E F7DB EB95 8883 0988 9AB7 3177`, generated
-2026-08-31, expires **2028-08-30**. The public half is committed at
-`.well-known/pgp-key.txt`. **The private key is not in this repo and
-never will be** — it was generated in an isolated, temporary
-`GNUPGHOME`, exported once, handed directly to the user as a file, and
-every local trace (the `GNUPGHOME`, the exported `.asc`, the key-gen
-params file) was deleted immediately after. Only the user has it.
+`david+security@mrai.dev`. Key: RSA 4096, primary `[SC]` fingerprint
+`D10E 948E 4C4C 0F5E F7DB EB95 8883 0988 9AB7 3177`, plus an RSA-4096
+`[E]` encryption subkey `9793 94A2 02B9 2E73 2281 C155 4B15 EC59 CABB
+D2DA` (added 2026-08-30 so the `Encryption` field points to a key that
+can actually receive encrypted mail — internet.nl flags its absence).
+Generated 2026-08-31, both parts expire **2028-08-30**. The public half
+is committed at `.well-known/pgp-key.txt`. **The private key is not in
+this repo and never will be** — it was generated in an isolated,
+temporary `GNUPGHOME`, exported once, handed directly to the user as a
+file, and every local trace (the `GNUPGHOME`, the exported `.asc`, the
+key-gen params file) was deleted immediately after. Only the user has
+it.
 
 This key replaced the original 2026-08-24 key (fingerprint
 `FA45 B5FB CAD0 90F2 E937 C41E ACF0 ECA1 6685 7F6D`) on 2026-08-30. The
@@ -274,6 +278,7 @@ Fields (CRLF line endings per RFC 9116, before signing):
 ```
 Contact: mailto:david+security@mrai.dev
 Expires: 2027-08-30T23:59:59.000Z
+Encryption: https://johndlr.com/.well-known/pgp-key.txt
 Preferred-Languages: en
 Canonical: https://johndlr.com/.well-known/security.txt
 ```
@@ -293,10 +298,11 @@ different key), generate a fresh key pair the same way this one was
 made: isolated temp `GNUPGHOME` (use a short path like `/tmp/gh.XXXXXX`
 — a long path breaks the gpg-agent socket, which has a length limit),
 `%no-protection` batch key-gen so it can be handed over passphrase-free,
-export the public half to `.well-known/pgp-key.txt`, clearsign
-`.well-known/security.txt`, hand the private key to the user as a file,
-then delete every local trace. Don't reuse a key whose private half
-might have left the user's control.
+give it both a sign (`[SC]`) and an encrypt (`[E]`) capability so the
+`Encryption` field resolves to a usable key, export the public half to
+`.well-known/pgp-key.txt`, clearsign `.well-known/security.txt`, hand the
+private key to the user as a file, then delete every local trace. Don't
+reuse a key whose private half might have left the user's control.
 
 **Verify like an outside visitor after any change** — this is the only
 real proof; verifying against your own keyring (which already trusts a
