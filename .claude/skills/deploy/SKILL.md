@@ -68,10 +68,21 @@ set -e
 DEST=/home/johndlr/public_html
 SRC=/tmp/johndlr_deploy
 rsync -a "$SRC/" "$DEST/"
+find "$DEST" -type d -exec chmod 755 {} +
+find "$DEST" -type f -exec chmod 644 {} +
 chown -R johndlr:johndlr "$DEST"
 rm -rf "$SRC"
 REMOTE
 ```
+
+**The `chmod` normalisation is required, not optional.** The working
+copy on the dev machine has restrictive perms (`-rw-------` on files,
+`drwx------` on dirs), `rsync -a` preserves them, and Apache then
+returns `403` for every file it can't read — on 2026-08-30 a deploy did
+exactly this and took `css/`, `js/`, `assets/`, and `robots.txt` offline
+until the perms were fixed (`AH00132: file permissions deny server
+access` in `johndlr.com_error.log`). Docroot content must be world-
+readable: `644` files, `755` dirs.
 
 No `--delete` is used, so nothing gets removed server-side that isn't
 also removed from this repo — if a stray file ever shows up on the
