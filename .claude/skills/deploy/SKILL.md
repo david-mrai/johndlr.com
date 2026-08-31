@@ -243,19 +243,26 @@ HTTPS responses (including error pages) still do.
 ## security.txt maintenance
 
 `.well-known/security.txt` (RFC 9116) is PGP clear-signed for
-`david+security@mrai.dev`. Key: RSA 4096, sign-only, generated
-2026-08-24, expires **2027-08-24**. The public half is committed at
+`david+security@mrai.dev`. Key: RSA 4096, sign-only, fingerprint
+`D10E 948E 4C4C 0F5E F7DB EB95 8883 0988 9AB7 3177`, generated
+2026-08-31, expires **2028-08-30**. The public half is committed at
 `.well-known/pgp-key.txt`. **The private key is not in this repo and
 never will be** — it was generated in an isolated, temporary
 `GNUPGHOME`, exported once, handed directly to the user as a file, and
 every local trace (the `GNUPGHOME`, the exported `.asc`, the key-gen
 params file) was deleted immediately after. Only the user has it.
 
+This key replaced the original 2026-08-24 key (fingerprint
+`FA45 B5FB CAD0 90F2 E937 C41E ACF0 ECA1 6685 7F6D`) on 2026-08-30. The
+old key's private half may still exist on the user's machine; it is no
+longer published, so anything signed by it should be treated as
+untrusted from that date.
+
 Fields (CRLF line endings per RFC 9116, before signing):
 
 ```
 Contact: mailto:david+security@mrai.dev
-Expires: 2027-08-24T23:59:59.000Z
+Expires: 2027-08-30T23:59:59.000Z
 Preferred-Languages: en
 Canonical: https://johndlr.com/.well-known/security.txt
 ```
@@ -297,7 +304,8 @@ Expect `gpg: Good signature from "johndlr Security <david+security@mrai.dev>"`.
 The accompanying `WARNING: The key's User ID is not certified with a
 trusted signature!` is normal and expected for a self-published,
 uncertified key — it's not an error. Confirmed working live against
-`https://johndlr.com/` on 2026-08-24.
+`https://johndlr.com/` on 2026-08-24, and again after the key rotation
+on 2026-08-30.
 
 ## TLSA (DANE) sync
 
