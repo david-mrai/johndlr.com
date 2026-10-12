@@ -259,7 +259,7 @@ HTTPS responses (including error pages) still do.
 `[E]` encryption subkey `9793 94A2 02B9 2E73 2281 C155 4B15 EC59 CABB
 D2DA` (added 2026-08-30 so the `Encryption` field points to a key that
 can actually receive encrypted mail — internet.nl flags its absence).
-Generated 2026-08-31, both parts expire **2028-08-30**. The public half
+Generated 2026-08-31, both parts expire **2028-10-11** (extended 2026-10-12). The public half
 is committed at `.well-known/pgp-key.txt`. **The private key is not in
 this repo and never will be** — it was generated in an isolated,
 temporary `GNUPGHOME`, exported once, handed directly to the user as a
@@ -277,13 +277,13 @@ Fields (CRLF line endings per RFC 9116, before signing):
 
 ```
 Contact: mailto:david+security@mrai.dev
-Expires: 2027-08-30T23:59:59.000Z
+Expires: 2027-10-11T00:00:00.000Z
 Encryption: https://johndlr.com/.well-known/pgp-key.txt
 Preferred-Languages: en
 Canonical: https://johndlr.com/.well-known/security.txt
 ```
 
-To re-sign with a new `Expires` date before 2027-08-24 (or sooner, if
+To re-sign with a new `Expires` date before 2027-10-11 (or sooner, if
 the fields themselves need to change): the user imports their own stored
 copy of the private key (`gpg --import <path>`), then re-clearsign the
 updated field list:
