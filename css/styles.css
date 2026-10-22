@@ -603,3 +603,50 @@
     }
   }
 }
+
+/* ---------------------------------------------------------------- */
+/* Real photos (stock placeholders for now)                         */
+/* ---------------------------------------------------------------- */
+@layer components {
+  .hero-bg {
+    background-image:
+      linear-gradient(
+        180deg in oklab,
+        color-mix(in oklab, var(--color-black) 58%, transparent),
+        color-mix(in oklab, var(--color-black) 90%, transparent)
+      ),
+      url("../images/hero.webp");
+    background-size: cover;
+    background-position: center 32%;
+    background-repeat: no-repeat;
+  }
+
+  .photo {
+    inline-size: 100%;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--color-border);
+  }
+
+  .gallery-grid {
+    align-items: start;
+  }
+
+  .gallery-grid .photo {
+    aspect-ratio: 4 / 3;
+    margin: 0;
+  }
+
+  .photo-credits {
+    margin-block-start: 0.6rem;
+    font-size: 0.72rem;
+    line-height: 1.5;
+    color: var(--color-text-muted);
+    opacity: 0.7;
+  }
+
+  .photo-credits a {
+    text-decoration: underline;
+  }
+}
