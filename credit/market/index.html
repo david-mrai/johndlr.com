@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>The Debt Consolidation Market | johndlr.com</title>
+<meta name="description" content="Market size, the debt consolidation workflow, and estimated lender market share.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#14213D; --paper:#F7F9FC; --surface:#FFFFFF; --steel:#3A6EA5; --gold:#E0A526;
+  --slate:#5E6C84; --line:#DCE3EE; --soft:#EEF3F9;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --ink:#E6ECF5; --paper:#0F1726; --surface:#16213A; --steel:#7FA8D9; --gold:#F0BE4A;
+    --slate:#9AA8BF; --line:#2A3858; --soft:#1B2844;
+  }
+}
+:root[data-theme="dark"]{
+  --ink:#E6ECF5; --paper:#0F1726; --surface:#16213A; --steel:#7FA8D9; --gold:#F0BE4A;
+  --slate:#9AA8BF; --line:#2A3858; --soft:#1B2844;
+}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{
+  margin:0; background:var(--paper); color:var(--ink);
+  font-family:"Manrope",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  font-size:1.0625rem; line-height:1.6; font-variant-numeric:tabular-nums;
+}
+a{color:var(--steel)}
+a:focus-visible,button:focus-visible{outline:3px solid var(--gold);outline-offset:3px;border-radius:4px}
+.wrap{max-width:68rem;margin:0 auto;padding:0 1.25rem}
+.prose{max-width:40rem}
+h1,h2,h3{line-height:1.15;margin:0 0 .6em;letter-spacing:-.02em}
+h1{font-size:clamp(2.3rem,6vw,4rem);font-weight:800}
+h2{font-size:clamp(1.6rem,3.4vw,2.25rem);font-weight:700}
+h3{font-size:1.1rem;font-weight:700}
+p{margin:0 0 1em}
+.muted{color:var(--slate)}
+section{padding:4.5rem 0;border-top:1px solid var(--line)}
+
+/* Hero: many debts merge into one payment */
+.hero{padding:3.5rem 0 3rem;border:0}
+.hero-grid{display:grid;gap:2rem;align-items:center}
+@media (min-width:860px){.hero-grid{grid-template-columns:1.05fr 1fr}}
+.hero p.lede{font-size:1.2rem;max-width:34rem}
+.merge svg{width:100%;height:auto;display:block}
+.merge .debt{fill:none;stroke:var(--steel);stroke-width:3;opacity:.55;stroke-linecap:round}
+.merge .one{fill:none;stroke:var(--gold);stroke-width:9;stroke-linecap:round}
+.merge text{fill:var(--slate);font:600 13px "Manrope",system-ui,sans-serif}
+.merge .pay{fill:var(--ink);font-weight:700}
+@media (prefers-reduced-motion:no-preference){
+  .merge .debt{stroke-dasharray:420;stroke-dashoffset:420;animation:draw 1.4s ease-out forwards}
+  .merge .one{stroke-dasharray:260;stroke-dashoffset:260;animation:draw .8s 1.2s ease-out forwards}
+  @keyframes draw{to{stroke-dashoffset:0}}
+}
+.keyfig{display:flex;flex-wrap:wrap;gap:1.75rem;margin-top:1.75rem}
+.keyfig div{border-left:3px solid var(--gold);padding-left:.8rem}
+.keyfig strong{display:block;font-size:1.6rem;font-weight:800}
+.keyfig span{color:var(--slate);font-size:.9rem}
+
+/* Market size range chart */
+.estimates{margin-top:2rem;display:grid;gap:1.4rem}
+.est{display:grid;gap:.4rem}
+.est-head{display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap}
+.est-head b{font-weight:700}
+.bar{height:14px;background:var(--soft);border-radius:7px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--steel);border-radius:7px}
+.est.hl .bar i{background:var(--gold)}
+.est small{color:var(--slate)}
+.scale-note{font-size:.9rem;color:var(--slate);margin-top:.5rem}
+
+/* Workflow */
+.flow{list-style:none;padding:0;margin:2.25rem 0 0;display:grid;gap:0;counter-reset:step}
+.step{display:grid;grid-template-columns:3rem 1fr;gap:1rem;position:relative;padding-bottom:1.75rem}
+.step::before{
+  counter-increment:step;content:counter(step);
+  width:3rem;height:3rem;border-radius:50%;display:grid;place-items:center;
+  background:var(--surface);border:2px solid var(--steel);color:var(--steel);font-weight:800;z-index:1;
+}
+.step:not(:last-child)::after{content:"";position:absolute;left:1.5rem;top:3rem;bottom:0;width:2px;background:var(--line);transform:translateX(-1px)}
+.step.final::before{background:var(--gold);border-color:var(--gold);color:#14213D}
+.step h3{margin:.55rem 0 .3rem}
+.step p{margin:0;color:var(--slate)}
+.options{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:.7rem}
+.options span{font-size:.88rem;padding:.3rem .7rem;border:1px solid var(--line);border-radius:999px;background:var(--surface)}
+.branch{margin-top:.8rem;padding:.8rem 1rem;border-left:3px dashed var(--slate);background:var(--soft);border-radius:0 8px 8px 0;font-size:.95rem}
+.branch b{color:var(--ink)}
+
+/* Pie */
+.share-grid{display:grid;gap:2.5rem;align-items:center;margin-top:2rem}
+@media (min-width:860px){.share-grid{grid-template-columns:minmax(0,1fr) minmax(0,1.1fr)}}
+.pie-box{max-width:26rem;width:100%;margin:0 auto;position:relative}
+.pie-box svg{width:100%;height:auto;display:block}
+.pie-box path{stroke:var(--paper);stroke-width:2;cursor:pointer;transition:opacity .15s}
+.pie-box.focus path{opacity:.35}
+.pie-box.focus path.on{opacity:1}
+.pie-center{position:absolute;inset:0;display:grid;place-items:center;text-align:center;pointer-events:none}
+.pie-center strong{display:block;font-size:2rem;font-weight:800;line-height:1.1}
+.pie-center span{color:var(--slate);font-size:.9rem;display:block;max-width:9rem}
+.legend{list-style:none;margin:0;padding:0;display:grid;gap:.25rem}
+.legend button{
+  all:unset;box-sizing:border-box;width:100%;display:grid;grid-template-columns:1rem 1fr auto;gap:.75rem;align-items:center;
+  padding:.5rem .6rem;border-radius:8px;cursor:pointer;
+}
+.legend button:hover,.legend button.on{background:var(--soft)}
+.legend button:focus-visible{outline:3px solid var(--gold)}
+.sw{width:1rem;height:1rem;border-radius:3px}
+.legend .pct{font-weight:700}
+.legend .tag{font-size:.78rem;color:var(--slate);display:block;font-weight:500}
+.caveat{margin-top:2rem;padding:1rem 1.2rem;background:var(--surface);border:1px solid var(--line);border-radius:10px;font-size:.95rem}
+
+footer{padding:3rem 0 4rem;border-top:1px solid var(--line);font-size:.9rem;color:var(--slate)}
+footer ol{padding-left:1.2rem;margin:.5rem 0 0}
+footer li{margin-bottom:.35rem;overflow-wrap:anywhere}
+</style>
+</head>
+<body>
+<main>
+  <header class="hero">
+    <div class="wrap hero-grid">
+      <div>
+        <h1>The debt consolidation market</h1>
+        <p class="lede">How big it is, how a consolidation actually moves from application to payoff, and which lenders do the most of it.</p>
+        <div class="keyfig">
+          <div><strong>$15.7B–$18.5B</strong><span>Most-cited 2025 market size</span></div>
+          <div><strong>~8%</strong><span>Projected annual growth</span></div>
+          <div><strong>$281B</strong><span>U.S. personal loan balances</span></div>
+        </div>
+      </div>
+      <figure class="merge" aria-label="Illustration: five separate debts merging into one monthly payment">
+        <svg viewBox="0 0 520 300" role="img" aria-hidden="true">
+          <text x="4" y="44">Credit card</text>
+          <text x="4" y="94">Store card</text>
+          <text x="4" y="154">Medical bill</text>
+          <text x="4" y="214">Personal loan</text>
+          <text x="4" y="264">Credit card</text>
+          <path class="debt" d="M100 40 C220 40 250 150 330 150"/>
+          <path class="debt" d="M100 90 C210 90 250 150 330 150"/>
+          <path class="debt" d="M100 150 L330 150"/>
+          <path class="debt" d="M100 210 C210 210 250 150 330 150"/>
+          <path class="debt" d="M100 260 C220 260 250 150 330 150"/>
+          <path class="one" d="M330 150 L500 150"/>
+          <text class="pay" x="360" y="132">One payment</text>
+        </svg>
+      </figure>
+    </div>
+  </header>
+
+  <section id="size">
+    <div class="wrap">
+      <div class="prose">
+        <h2>How big is the market?</h2>
+        <p>There's no single agreed number. Research firms define "debt consolidation" differently: some count only the fees and revenue providers earn, others count the value of the debt being consolidated. That's why published 2025 estimates run from about $1.3 billion to over $200 billion.</p>
+      </div>
+      <div class="estimates" role="list">
+        <div class="est" role="listitem">
+          <div class="est-head"><b>Service revenue only</b><span>$1.27B</span></div>
+          <div class="bar"><i style="width:.6%"></i></div>
+          <small>Business Research Insights, 2025. Projected $1.92B by 2033 (4.7% CAGR).</small>
+        </div>
+        <div class="est hl" role="listitem">
+          <div class="est-head"><b>Consumer + corporate providers</b><span>$15.7B–$18.5B</span></div>
+          <div class="bar"><i style="width:8.2%"></i></div>
+          <small>HTF Market Intelligence ($18.5B, to $32.7B by 2033) and Market Research Intellect ($15.7B, to $34.9B by 2035). Growth of roughly 8% a year.</small>
+        </div>
+        <div class="est" role="listitem">
+          <div class="est-head"><b>Includes consolidated loan volume</b><span>~$225B</span></div>
+          <div class="bar"><i style="width:100%"></i></div>
+          <small>Data Insights Market: ~$150B consumer (8% CAGR) plus ~$75B corporate (7% CAGR).</small>
+        </div>
+      </div>
+      <p class="scale-note">Bars are drawn to scale. The highlighted middle range is the figure most often cited for business planning.</p>
+      <div class="prose" style="margin-top:1.5rem">
+        <p>The underlying demand is large and growing. U.S. personal loan balances, the main vehicle for consolidating credit card debt, reached a record $281 billion in Q2 2026, up 9.6% year over year, according to TransUnion. The Federal Reserve put the average 24-month personal loan APR at 11.86% in May 2026, versus 22.15% on credit cards charged interest, and that spread is what drives most consolidation.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="workflow">
+    <div class="wrap">
+      <div class="prose">
+        <h2>The debt consolidation workflow</h2>
+        <p>Every provider packages it differently, but a consumer consolidation follows the same path from scattered balances to a single payment.</p>
+      </div>
+      <ol class="flow">
+        <li class="step">
+          <div>
+            <h3>Take inventory of debts</h3>
+            <p>List every balance, APR, minimum payment and due date. This sets the payoff amount and the rate the new product needs to beat.</p>
+          </div>
+        </li>
+        <li class="step">
+          <div>
+            <h3>Pre-qualify with a soft credit pull</h3>
+            <p>Check rates with several lenders without affecting the credit score. Lenders estimate eligibility from credit score, income and debt-to-income ratio.</p>
+          </div>
+        </li>
+        <li class="step">
+          <div>
+            <h3>Choose a consolidation path</h3>
+            <p>Compare total cost, including origination fees and term length, not just the monthly payment.</p>
+            <div class="options"><span>Personal consolidation loan</span><span>0% balance transfer card</span><span>Home equity loan or HELOC</span><span>Debt management plan</span></div>
+          </div>
+        </li>
+        <li class="step">
+          <div>
+            <h3>Apply and underwrite</h3>
+            <p>A hard credit pull plus income and identity verification. The lender sets the final APR, amount and term.</p>
+            <div class="branch"><b>If declined:</b> the borrower typically moves to a nonprofit debt management plan through credit counseling, or, as a last resort, debt settlement or bankruptcy.</div>
+          </div>
+        </li>
+        <li class="step">
+          <div>
+            <h3>Fund and pay off creditors</h3>
+            <p>Funds go directly to the old creditors (many lenders offer direct pay) or to the borrower, who then pays each balance in full.</p>
+          </div>
+        </li>
+        <li class="step">
+          <div>
+            <h3>Make one fixed monthly payment</h3>
+            <p>One due date, one fixed rate, one payoff date. Autopay discounts often lower the APR further.</p>
+          </div>
+        </li>
+        <li class="step final">
+          <div>
+            <h3>Pay off and rebuild credit</h3>
+            <p>Lower card utilization usually lifts the credit score early on. The plan works only if the paid-off cards aren't run back up.</p>
+          </div>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <section id="share">
+    <div class="wrap">
+      <div class="prose">
+        <h2>Who holds the market</h2>
+        <p>Estimated share of U.S. unsecured personal loan originations, the product behind most consumer debt consolidation, using Q2 2026 volume. Tap a slice or a name to see it.</p>
+      </div>
+      <div class="share-grid">
+        <div class="pie-box" id="pieBox">
+          <svg viewBox="0 0 200 200" id="pie" role="img" aria-labelledby="pieTitle"><title id="pieTitle">Pie chart of estimated lender market share</title></svg>
+          <div class="pie-center" aria-live="polite"><div><strong id="cVal">~$60B</strong><span id="cLbl">Est. Q2 2026 originations</span></div></div>
+        </div>
+        <ul class="legend" id="legend"></ul>
+      </div>
+      <div class="caveat">
+        <strong>How these shares were built.</strong> No public source publishes complete lender-by-lender market share. SoFi ($10.7B in personal loans), Upstart ($4.2B) and Happen, formerly LendingClub ($3.1B), are from their reported Q2 2026 originations. The other named lenders are estimates based on their recent reported run rates. The total market (~$60B a quarter) is estimated from TransUnion's record 7.6 million personal loan originations per quarter and typical loan sizes. Treat every figure except the three reported ones as approximate.
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <strong>Sources</strong>
+    <ol>
+      <li>HTF Market Intelligence, Global Consumer and Corporate Debt Consolidation Market: htfmarketintelligence.com</li>
+      <li>Market Research Intellect, Global Debt Consolidation Market: marketresearchintellect.com</li>
+      <li>Business Research Insights, Debt Consolidation Market: businessresearchinsights.com</li>
+      <li>Data Insights Market, Consumer and Corporate Debt Consolidation: datainsightsmarket.com</li>
+      <li>TransUnion Q1 and Q2 2026 Credit Industry Insights Reports: newsroom.transunion.com</li>
+      <li>Zacks via Yahoo Finance, SoFi Q2 2026 originations and competitors (Aug 2026)</li>
+      <li>Money.com, Best Personal Loans, citing Federal Reserve rate data (Sep 2026)</li>
+    </ol>
+    <p style="margin-top:1rem">Figures current as of September 2026. This page is for information only and isn't financial advice.</p>
+  </div>
+</footer>
+
+<script>
+(function(){
+  // share %, reported = from company filings; others estimated
+  var data = [
+    {name:"SoFi", v:17.8, c:"#3A6EA5", note:"Reported: $10.7B"},
+    {name:"Upstart", v:7.0, c:"#E0A526", note:"Reported: $4.2B"},
+    {name:"Happen (formerly LendingClub)", v:5.2, c:"#2E8B7A", note:"Reported: $3.1B"},
+    {name:"OneMain Financial", v:5.0, c:"#8E5BB5", note:"Estimated"},
+    {name:"Upgrade", v:3.3, c:"#D0567A", note:"Estimated"},
+    {name:"Best Egg", v:2.8, c:"#5FA8D3", note:"Estimated"},
+    {name:"Capital One (Discover)", v:2.5, c:"#B8742E", note:"Estimated"},
+    {name:"Prosper", v:1.5, c:"#7A9E3A", note:"Estimated"},
+    {name:"Avant", v:1.0, c:"#9C8E7A", note:"Estimated"},
+    {name:"Banks, credit unions & all others", v:53.9, c:"#AEB9CA", note:"Estimated remainder"}
+  ];
+  var NS="http://www.w3.org/2000/svg", svg=document.getElementById("pie"),
+      legend=document.getElementById("legend"), box=document.getElementById("pieBox"),
+      cVal=document.getElementById("cVal"), cLbl=document.getElementById("cLbl");
+  var cx=100, cy=100, R=96, r=58, a=-Math.PI/2, total=data.reduce(function(s,d){return s+d.v},0);
+  function pt(rad,ang){return [cx+rad*Math.cos(ang), cy+rad*Math.sin(ang)]}
+  var active=null;
+  function select(i){
+    if(active===i){active=null}else{active=i}
+    box.classList.toggle("focus",active!==null);
+    data.forEach(function(d,j){ d.path.classList.toggle("on",j===active); d.btn.classList.toggle("on",j===active); d.btn.setAttribute("aria-pressed",j===active)});
+    if(active===null){cVal.textContent="~$60B";cLbl.textContent="Est. Q2 2026 originations"}
+    else{cVal.textContent=data[active].v.toFixed(1)+"%";cLbl.textContent=data[active].name}
+  }
+  data.forEach(function(d,i){
+    var sweep=d.v/total*Math.PI*2, a2=a+sweep, big=sweep>Math.PI?1:0;
+    var p1=pt(R,a),p2=pt(R,a2),p3=pt(r,a2),p4=pt(r,a);
+    var path=document.createElementNS(NS,"path");
+    path.setAttribute("d","M"+p1+" A"+R+" "+R+" 0 "+big+" 1 "+p2+" L"+p3+" A"+r+" "+r+" 0 "+big+" 0 "+p4+"Z");
+    path.setAttribute("fill",d.c);
+    var t=document.createElementNS(NS,"title"); t.textContent=d.name+": "+d.v+"%"; path.appendChild(t);
+    path.addEventListener("click",function(){select(i)});
+    svg.appendChild(path); d.path=path; a=a2;
+    var li=document.createElement("li"), b=document.createElement("button");
+    b.type="button"; b.setAttribute("aria-pressed","false");
+    b.innerHTML='<span class="sw" style="background:'+d.c+'"></span><span>'+d.name+'<span class="tag">'+d.note+'</span></span><span class="pct">'+d.v.toFixed(1)+'%</span>';
+    b.addEventListener("click",function(){select(i)});
+    li.appendChild(b); legend.appendChild(li); d.btn=b;
+  });
+})();
+</script>
+</body>
+</html>
